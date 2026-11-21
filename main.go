@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"todo/todo-list/todo"
+	"todo/todo"
 )
 
 func main() {
