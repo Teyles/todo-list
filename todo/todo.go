@@ -6,8 +6,26 @@ import (
 	"time"
 )
 
-var events []Event
-var cases = make(map[string]Task)
+type Storage interface {
+	AddTask(title string, desc string) error
+	ListTasks()
+	DeleteTask(title string) error
+	DoneTask(title string) error
+	EditTask(title string, newDesc string) error
+	AddEvent(input string, errText string)
+	ListEvents()
+}
+
+type MemoryStorage struct {
+	cases  map[string]Task
+	events []Event
+}
+
+func NewMemoryStorage() *MemoryStorage {
+	return &MemoryStorage{
+		cases: make(map[string]Task),
+	}
+}
 
 type Task struct {
 	Title       string
@@ -23,13 +41,13 @@ type Event struct {
 	CreatedAt time.Time
 }
 
-func AddTask(title string, desc string) error {
-	_, ok := cases[title]
+func (s *MemoryStorage) AddTask(title string, desc string) error {
+	_, ok := s.cases[title]
 	if ok {
 		return errors.New("задача c таким заголовком уже есть")
 	}
 
-	cases[title] = Task{
+	s.cases[title] = Task{
 		Title:       title,
 		Description: desc,
 		CreatedAt:   time.Now(),
@@ -38,28 +56,28 @@ func AddTask(title string, desc string) error {
 	return nil
 }
 
-func ListTasks() {
-	if len(cases) == 0 {
+func (s *MemoryStorage) ListTasks() {
+	if len(s.cases) == 0 {
 		fmt.Println("список задач пока пуст")
 	} else {
-		for k, task := range cases {
+		for k, task := range s.cases {
 			fmt.Println(k, task)
 		}
 	}
 }
 
-func DeleteTask(title string) error {
-	_, ok := cases[title]
+func (s *MemoryStorage) DeleteTask(title string) error {
+	_, ok := s.cases[title]
 	if !ok {
 		return errors.New("задачи c таким заголовком нет")
 	} else {
-		delete(cases, title)
+		delete(s.cases, title)
 	}
 	return nil
 }
 
-func DoneTask(title string) error {
-	task, ok := cases[title]
+func (s *MemoryStorage) DoneTask(title string) error {
+	task, ok := s.cases[title]
 	if !ok {
 		return errors.New("задачи c таким заголовком нет")
 	} else if task.Done {
@@ -68,33 +86,33 @@ func DoneTask(title string) error {
 		now := time.Now()
 		task.Done = true
 		task.CompletedAt = &now
-		cases[title] = task
+		s.cases[title] = task
 	}
 	return nil
 }
 
-func EditTask(title string, newDesc string) error {
-	task, ok := cases[title]
+func (s *MemoryStorage) EditTask(title string, newDesc string) error {
+	task, ok := s.cases[title]
 	if !ok {
 		return errors.New("такой задачи нет")
 	} else if task.Done {
 		return errors.New("задача уже выполнена")
 	} else {
 		task.Description = newDesc
-		cases[title] = task
+		s.cases[title] = task
 	}
 	return nil
 }
 
-func AddEvent(input string, errText string) {
-	events = append(events, Event{input, errText, time.Now()})
+func (s *MemoryStorage) AddEvent(input string, errText string) {
+	s.events = append(s.events, Event{input, errText, time.Now()})
 }
 
-func ListEvents() {
-	if len(events) == 0 {
+func (s *MemoryStorage) ListEvents() {
+	if len(s.events) == 0 {
 		fmt.Println("список событий пуст!")
 	} else {
-		for _, event := range events {
+		for _, event := range s.events {
 			fmt.Println(event)
 		}
 	}

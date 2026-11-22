@@ -12,6 +12,8 @@ func main() {
 
 	todo.PrintHelp()
 
+	store := todo.NewMemoryStorage()
+
 	for {
 		fmt.Print("Введите команду: ")
 
@@ -22,7 +24,7 @@ func main() {
 
 		text := scanner.Text()
 
-		if todo.HandlerCommand(text) {
+		if todo.HandlerCommand(text, store) {
 			return
 		}
 	}
