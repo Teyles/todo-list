@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
@@ -22,10 +23,10 @@ type Event struct {
 	CreatedAt time.Time
 }
 
-func AddTask(title string, desc string) string {
+func AddTask(title string, desc string) error {
 	_, ok := cases[title]
 	if ok {
-		return "Задача c таким заголовком уже есть"
+		return errors.New("задача c таким заголовком уже есть")
 	}
 
 	cases[title] = Task{
@@ -34,12 +35,12 @@ func AddTask(title string, desc string) string {
 		CreatedAt:   time.Now(),
 		Done:        false,
 	}
-	return ""
+	return nil
 }
 
 func ListTasks() {
 	if len(cases) == 0 {
-		fmt.Println("Список задач пока пуст")
+		fmt.Println("список задач пока пуст")
 	} else {
 		for k, task := range cases {
 			fmt.Println(k, task)
@@ -47,42 +48,42 @@ func ListTasks() {
 	}
 }
 
-func DeleteTask(title string) string {
+func DeleteTask(title string) error {
 	_, ok := cases[title]
 	if !ok {
-		return "Задачи c таким заголовком нет"
+		return errors.New("задачи c таким заголовком нет")
 	} else {
 		delete(cases, title)
 	}
-	return ""
+	return nil
 }
 
-func DoneTask(title string) string {
+func DoneTask(title string) error {
 	task, ok := cases[title]
 	if !ok {
-		return "Задачи c таким заголовком нет"
+		return errors.New("задачи c таким заголовком нет")
 	} else if task.Done {
-		return "Задача уже выполнена"
+		return errors.New("задача уже выполнена")
 	} else {
 		now := time.Now()
 		task.Done = true
 		task.CompletedAt = &now
 		cases[title] = task
 	}
-	return ""
+	return nil
 }
 
-func EditTask(title string, newDesc string) string {
+func EditTask(title string, newDesc string) error {
 	task, ok := cases[title]
 	if !ok {
-		return "Такой задачи нет!"
+		return errors.New("такой задачи нет")
 	} else if task.Done {
-		return "Задача уже выполнена"
+		return errors.New("задача уже выполнена")
 	} else {
 		task.Description = newDesc
 		cases[title] = task
 	}
-	return ""
+	return nil
 }
 
 func AddEvent(input string, errText string) {
@@ -91,7 +92,7 @@ func AddEvent(input string, errText string) {
 
 func ListEvents() {
 	if len(events) == 0 {
-		fmt.Println("Список событий пуст!")
+		fmt.Println("список событий пуст!")
 	} else {
 		for _, event := range events {
 			fmt.Println(event)

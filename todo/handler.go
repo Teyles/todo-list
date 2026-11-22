@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -14,16 +15,16 @@ func HandlerCommand(text string) bool {
 		return false
 	}
 
-	errText := ""
+	var err error
 
 	switch strings.ToLower(fields[0]) {
 	case "добавить":
 		if len(fields) < 3 {
-			errText = "He хватает заголовка или текста"
+			err = errors.New("нe хватает заголовка или текста")
 		} else {
 			desc := strings.Join(fields[2:], " ")
-			errText = AddTask(fields[1], desc)
-			if errText == "" {
+			err = AddTask(fields[1], desc)
+			if err == nil {
 				fmt.Println("Задача добавлена!")
 			}
 		}
@@ -31,33 +32,33 @@ func HandlerCommand(text string) bool {
 		if len(fields) == 1 {
 			ListTasks()
 		} else {
-			errText = "Лишние аргументы y команды"
+			err = errors.New("лишние аргументы y команды")
 		}
 	case "удалить":
 		if len(fields) != 2 {
-			errText = "Неверное количество слов"
+			err = errors.New("неверное количество слов")
 		} else {
-			errText = DeleteTask(fields[1])
-			if errText == "" {
+			err = DeleteTask(fields[1])
+			if err == nil {
 				fmt.Println("Задача удалена!")
 			}
 		}
 	case "выполнить":
 		if len(fields) != 2 {
-			errText = "Неправильно введена команда!"
+			err = errors.New("неправильно введена команда")
 		} else {
-			errText = DoneTask(fields[1])
-			if errText == "" {
+			err = DoneTask(fields[1])
+			if err == nil {
 				fmt.Println("Задача выполнена!")
 			}
 		}
 	case "изменить":
 		if len(fields) < 3 {
-			errText = "Неверно введена команда!"
+			err = errors.New("неверно введена команда")
 		} else {
 			newDesc := strings.Join(fields[2:], " ")
-			errText = EditTask(fields[1], newDesc)
-			if errText == "" {
+			err = EditTask(fields[1], newDesc)
+			if err == nil {
 				fmt.Println("Задача изменена!")
 			}
 		}
@@ -65,28 +66,30 @@ func HandlerCommand(text string) bool {
 		if len(fields) == 1 {
 			ListEvents()
 		} else {
-			errText = "Лишние аргументы у команды"
+			err = errors.New("лишние аргументы у команды")
 		}
 	case "помощь":
 		if len(fields) == 1 {
 			PrintHelp()
 		} else {
-			errText = "Лишние аргументы у команды"
+			err = errors.New("лишние аргументы у команды")
 		}
 	case "выход":
 		if len(fields) == 1 {
 			AddEvent(text, "")
 			return true
 		} else {
-			errText = "Лишние аргументы у команды"
+			err = errors.New("Лишние аргументы у команды")
 		}
 	default:
-		errText = "Неизвестная команда"
+		err = errors.New("Неизвестная команда")
 	}
 
-	if errText != "" {
-		fmt.Println("Ошибка: ", errText)
+	if err != nil {
+		fmt.Println("Ошибка: ", err.Error())
+		AddEvent(text, err.Error())
+	} else {
+		AddEvent(text, "")
 	}
-	AddEvent(text, errText)
 	return false
 }
