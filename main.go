@@ -1,9 +1,11 @@
+// Package main является точкой входа в приложение таск-менеджера.
 package main
 
 import (
 	"bufio"
 	"fmt"
 	"os"
+
 	"todo/todo"
 )
 
@@ -24,7 +26,8 @@ func main() {
 
 		text := scanner.Text()
 
-		if todo.HandlerCommand(text, store) {
+		shouldContinue := todo.HandlerCommand(text, store)
+		if !shouldContinue {
 			return
 		}
 	}

@@ -1,0 +1,46 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - staticcheck
+    - ineffassign
+    - gocritic
+    - prealloc
+    - cyclop
+    - bodyclose
+    - unparam
+    - gosec
+    - revive
+    - nakedret
+    - mnd
+  settings:
+    govet:
+      enable:
+        - shadow
+        - fieldalignment
+        - copylocks
+        - lostcancel
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+    cyclop:
+      max-complexity: 10
+    mnd:
+      ignored-numbers:
+        - "0"
+        - "1"
+        - "2"
+    nakedret:
+      max-func-lines: 15
+
+formatters:
+  enable:
+    - gofumpt
